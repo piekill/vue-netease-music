@@ -21,27 +21,21 @@
       <div class="login-body">
         <el-input
           class="input"
-          placeholder="请输入您的网易云uid"
-          v-model="uid"
+          placeholder="请输入网易云邮箱账号"
+          v-model="email"
+          type="email"
         />
-        <div class="login-help">
-          <p class="help">
-            1、请
-            <a href="http://music.163.com" target="_blank"
-              >点我(http://music.163.com)</a
-            >打开网易云音乐官网
-          </p>
-          <p class="help">2、点击页面右上角的“登录”</p>
-          <p class="help">3、点击您的头像，进入我的主页</p>
-          <p class="help">
-            4、复制浏览器地址栏 /user/home?id= 后面的数字（网易云 UID）
-          </p>
-        </div>
+        <el-input
+          class="input"
+          placeholder="请输入密码"
+          v-model="password"
+          type="password"
+        />
       </div>
       <span class="dialog-footer" slot="footer">
         <el-button
           :loading="loading"
-          @click="onLogin(uid)"
+          @click="onLogin(email, password, uid)"
           class="login-btn"
           type="primary"
           >登 录</el-button
@@ -60,20 +54,24 @@ import {
   mapState as mapUserState,
   mapGetters as mapUserGetters
 } from "@/store/helper/user"
+import router from '@/router.js'
 
 export default {
   // 自动登录
   created() {
-    const uid = storage.get(UID_KEY)
-    if (isDef(uid)) {
-      this.onLogin(uid)
+    this.uid = storage.get(UID_KEY)
+    if (isDef(this.uid)) {
+      this.onLogin(null, null, this.uid)
+      this.refresh()
     }
   },
   data() {
     return {
       visible: false,
       loading: false,
-      uid: ""
+      uid: null,
+      email: "",
+      password: ""
     }
   },
   methods: {
@@ -83,9 +81,9 @@ export default {
     onCloseModal() {
       this.visible = false
     },
-    async onLogin(uid) {
+    async onLogin(email, password, uid) {
       this.loading = true
-      const success = await this.login(uid).finally(() => {
+      const success = await this.login({email, password, uid}).finally(() => {
         this.loading = false
       })
       if (success) {
@@ -95,9 +93,10 @@ export default {
     onLogout() {
       confirm("确定要注销吗？", () => {
         this.logout()
+        router.push('/')
       })
     },
-    ...mapUserActions(["login", "logout"])
+    ...mapUserActions(["login", "logout", "refresh", "checkStatus"])
   },
   computed: {
     ...mapUserState(["user"]),

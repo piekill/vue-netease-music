@@ -97,6 +97,7 @@
       @ended="end"
       @timeupdate="updateTime"
       ref="audio"
+      autoplay
     ></audio>
   </div>
 </template>

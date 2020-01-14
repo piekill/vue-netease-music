@@ -1,6 +1,7 @@
 import { getSongUrl } from "@/api"
 import storage from 'good-storage'
 import { PLAY_HISTORY_KEY, notify, getSongImg } from '@/utils'
+import store from '@/store'
 
 export default {
   // 整合歌曲信息 并且开始播放
@@ -9,10 +10,16 @@ export default {
     // 1.不污染元数据
     // 2.单曲循环为了触发watch
     const song = Object.assign({}, rawSong)
+    let isCloud = false
     if (!song.img) {
       if (song.albumId) {
         song.img = await getSongImg(song.id, song.albumId)
       }
+    }
+    if (store.state.user.cloudList.has(song.id)) {
+      const { data } = await getSongUrl(song.id)
+      song.url = data[0].url
+      isCloud = true
     }
     commit('setCurrentSong', song)
     commit('setPlayingState', true)
@@ -28,11 +35,13 @@ export default {
     commit('setPlayHistory', playHistoryCopy)
     storage.set(PLAY_HISTORY_KEY, playHistoryCopy)
     // 检查是否能播放
-    const canPlay = await checkCanPlay(song.id)
+    const canPlay = isCloud || await checkCanPlay(song.id)
     if (!canPlay) {
       notify(`${song.name}播放失败`)
+      const curIdx = state.playlist.findIndex(({ id }) => song.id === id)
       // 清空当前歌曲
       dispatch('clearCurrentSong')
+      dispatch('startSong', state.playlist[(curIdx + 1) % state.playlist.length])
     }
   },
   clearCurrentSong({ commit }) {
