@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { Loading } from 'element-ui'
-import { confirm } from '@/base/confirm'
+// import { confirm } from '@/base/confirm'
 import store from '@/store'
 
 // const BASE_URL = 'https://api.mtnhao.com/'
-const BASE_URL = 'http://localhost:3000/'
+const BASE_URL = 'http://183.134.66.86:3000/'
 // 不带全局loading的请求实例
 export const requestWithoutLoading = createBaseInstance()
 // 带全局loading的请求实例
@@ -16,7 +16,6 @@ mixinLoading(request.interceptors)
 function createBaseInstance() {
   const instance = axios.create({
     baseURL: BASE_URL,
-    withCredentials: true
   })
 
   instance.interceptors.response.use(handleResponse, handleError)
@@ -24,7 +23,7 @@ function createBaseInstance() {
 }
 
 function handleError(e) {
-  confirm(e.message, '出错啦~')
+  // confirm(e.message, '出错啦~')
   throw e
 }
 

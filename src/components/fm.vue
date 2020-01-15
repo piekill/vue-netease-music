@@ -1,158 +1,75 @@
-<template >
-  <transition name="slide">
-    <div
-      :class="getPlayerShowCls()"
-      class="player"
-    >
-      <div class="content">
-        <div class="song">
-          <div class="left">
-            <img
-              class="play-bar-support"
-              src="@/assets/image/play-bar-support.png"
-            />
-            <img
-              :class="{playing}"
-              class="play-bar"
-              src="@/assets/image/play-bar.png"
-            />
-            <div
-              class="img-outer-border"
-              ref="disc"
-            >
-              <div
-                :class="{paused: !playing}"
-                class="img-outer"
-                ref="discRotate"
-              >
-                <div class="img-wrap">
-                  <img v-lazy="$utils.genImgUrl(currentSong.img, 400)" />
-                </div>
+<template>
+  <div class="fm">
+    <div class="content">
+      <div class="song">
+        <div class="left">
+          <img class="play-bar-support" src="@/assets/image/play-bar-support.png" />
+          <img :class="{playing}" class="play-bar" src="@/assets/image/play-bar.png" />
+          <div class="img-outer-border" ref="disc">
+            <div :class="{paused: !playing}" class="img-outer" ref="discRotate">
+              <div class="img-wrap">
+                <img v-lazy="$utils.genImgUrl(currentSong.img, 400)" />
               </div>
             </div>
           </div>
-          <div class="right">
-            <div class="name-wrap">
-              <p class="name">{{currentSong.name}}</p>
-              <span
-                @click="onGoMv"
-                class="mv-tag"
-                v-if="currentSong.mvId"
-              >MV</span>
-            </div>
-            <div class="desc">
-              <div class="desc-item">
-                <span class="label">歌手：</span>
-                <div class="value">{{currentSong.artistsText}}</div>
-              </div>
-            </div>
-            <empty v-if="nolyric">还没有歌词哦~</empty>
-            <Scroller
-              :data="lyric"
-              :options="{disableTouch: true}"
-              @init="onInitScroller"
-              class="lyric-wrap"
-              ref="scroller"
-              v-else
-            >
-              <div>
-                <div
-                  :class="getActiveCls(index)"
-                  :key="index"
-                  class="lyric-item"
-                  ref="lyric"
-                  v-for="(l,index) in lyricWithTranslation"
-                >
-                  <p
-                    :key="contentIndex"
-                    class="lyric-text"
-                    v-for="(content, contentIndex) in l.contents"
-                  >{{content}}</p>
-                </div>
-              </div>
-            </Scroller>
+          <div class="controls">
+            <el-button @click="newFMSong" circle type="primary" style="font-size: 22px;">➤</el-button>
           </div>
         </div>
-        <div class="bottom">
-          <div class="left">
-            <Comments
-              :id="currentSong.id"
-              ref="comments"
-              v-if="currentSong.id"
-            />
+
+        <div class="right">
+          <div class="name-wrap">
+            <p class="name">{{currentSong.name}}</p>
+            <span @click="onGoMv" class="mv-tag" v-if="currentSong.mvId">MV</span>
           </div>
-          <div
-            class="right"
-            v-if="simiPlaylists.concat(simiSongs).length"
-          >
-            <Loading
-              :loading="simiLoading"
-              v-if="simiLoading"
-            />
-            <div v-else>
-              <div
-                class="simi-playlists"
-                v-if="simiPlaylists.length"
-              >
-                <p class="title">包含这首歌的歌单</p>
-                <div
-                  :key="simiPlaylist.id"
-                  class="simi-item"
-                  v-for="simiPlaylist in simiPlaylists"
-                >
-                  <Card
-                    :img="simiPlaylist.coverImgUrl"
-                    :name="simiPlaylist.name"
-                    @click="onClickPlaylist(simiPlaylist.id)"
-                  >
-                    <template v-slot:desc>
-                      <div class="desc">
-                        <Icon
-                          :size="12"
-                          color="shallow"
-                          type="play"
-                        />
-                        <p class="count">{{$utils.formatNumber(simiPlaylist.playCount)}}</p>
-                      </div>
-                    </template>
-                  </Card>
-                </div>
-              </div>
-              <div
-                class="simi-songs"
-                v-if="simiSongs.length"
-              >
-                <p class="title">相似歌曲</p>
-                <div
-                  :key="simiSong.id"
-                  class="simi-item"
-                  v-for="simiSong in simiSongs"
-                >
-                  <Card
-                    :desc="simiSong.artistsText"
-                    :img="simiSong.img"
-                    :name="simiSong.name"
-                    @click="onClickSong(simiSong)"
-                  >
-                    <template v-slot:img-mask>
-                      <PlayIcon class="play-icon" />
-                    </template>
-                  </Card>
-                </div>
-              </div>
+          <div class="desc">
+            <div class="desc-item">
+              <span class="label">歌手：</span>
+              <div class="value">{{currentSong.artistsText}}</div>
             </div>
           </div>
+          <empty v-if="nolyric">还没有歌词哦~</empty>
+          <Scroller
+            :data="lyric"
+            :options="{disableTouch: true}"
+            @init="onInitScroller"
+            class="lyric-wrap"
+            ref="scroller"
+            v-else
+          >
+            <div>
+              <div
+                :class="getActiveCls(index)"
+                :key="index"
+                class="lyric-item"
+                ref="lyric"
+                v-for="(l,index) in lyricWithTranslation"
+              >
+                <p
+                  :key="contentIndex"
+                  class="lyric-text"
+                  v-for="(content, contentIndex) in l.contents"
+                >{{content}}</p>
+              </div>
+            </div>
+          </Scroller>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="left">
+          <Comments :id="currentSong.id" ref="comments" v-if="currentSong.id" />
         </div>
       </div>
     </div>
-  </transition>
+  </div>
 </template>
 
-<script type="text/ecmascript-6">
-import { getLyric, getSimiSongs, getSimiPlaylists } from "@/api"
+<script>
+import { getLyric } from "@/api"
 import lyricParser from "@/utils/lrcparse"
 import { debounce, isDef, createSong, goMvWithCheck } from "@/utils"
 import Comments from "@/components/comments"
+import control from "@/utils/control"
 import { mapState, mapMutations, mapActions } from "@/store/helper/music"
 
 const WHEEL_TYPE = "wheel"
@@ -169,21 +86,54 @@ export default {
       [WHEEL_TYPE]: null,
       [SCROLL_TYPE]: null
     }
+    this.$nextTick(() => {
+      this.scrollToActiveLyric()
+    })
+    control.$on("nextFM", this.newFMSong)
   },
   data() {
     return {
       lyric: [],
       tlyric: [],
-      simiLoading: false,
-      simiPlaylists: [],
-      simiSongs: [],
       nolyric: false
     }
   },
+  mounted() {
+    if (!this.isFMMode) {
+      this.newFMSong()
+    } else {
+      this.updateLyric()
+    }
+  },
   methods: {
+    nomalizeSong(song) {
+      const {
+        id,
+        name,
+        mvid,
+        artists,
+        album: { blurPicUrl },
+        duration
+      } = song
+      return createSong({
+        id,
+        name,
+        img: blurPicUrl,
+        artists,
+        duration,
+        mvId: mvid
+      })
+    },
+    newFMSong() {
+      this.getFMSongs().then(songs => {
+        const normSong = this.nomalizeSong(songs.data[0])
+        this.startSong({'song': normSong, 'fmMode': true})
+        this.setPlaylist([normSong])
+        this.setPlaylistPromptShow(false)
+      })
+    },
     async updateSong() {
       this.updateLyric()
-      this.updateSimi()
     },
     async updateLyric() {
       const result = await getLyric(this.currentSong.id)
@@ -193,37 +143,6 @@ export default {
         this.lyric = lyric
         this.tlyric = tlyric
       }
-    },
-    async updateSimi() {
-      this.simiLoading = true
-      const [simiPlaylists, simiSongs] = await Promise.all([
-        getSimiPlaylists(this.currentSong.id),
-        getSimiSongs(this.currentSong.id)
-      ]).finally(() => {
-        this.simiLoading = false
-      })
-      this.simiPlaylists = simiPlaylists.playlists
-      this.simiSongs = simiSongs.songs.map(song => {
-        const {
-          id,
-          name,
-          artists,
-          mvid,
-          album: { picUrl },
-          duration
-        } = song
-        return createSong({
-          id,
-          name,
-          artists,
-          duration,
-          img: picUrl,
-          mvId: mvid
-        })
-      })
-    },
-    getPlayerShowCls() {
-      return this.isPlayerShow ? "show" : "hide"
     },
     getActiveCls(index) {
       return this.activeLyricIndex === index ? "active" : ""
@@ -287,8 +206,8 @@ export default {
     removeResizeListener() {
       window.removeEventListener("resize", this.resizeScroller)
     },
-    ...mapMutations(["setPlayerShow"]),
-    ...mapActions(["startSong", "addToPlaylist"])
+    ...mapMutations(["setPlayerShow", "setPlaylist", "setPlaylistPromptShow", "setFMMode"]),
+    ...mapActions(["startSong", "addToPlaylist", "getFMSongs"])
   },
   computed: {
     activeLyricIndex() {
@@ -331,21 +250,9 @@ export default {
       }
       return ret
     },
-    ...mapState(["currentSong", "currentTime", "playing", "isPlayerShow"])
+    ...mapState(["currentSong", "currentTime", "playing", "isPlayerShow", "isFMMode"])
   },
   watch: {
-    isPlayerShow(show) {
-      if (show) {
-        // 歌词短期内不会变化 所以只拉取相似信息
-        this.updateSimi()
-        this.addResizeListener()
-        this.$nextTick(() => {
-          this.scrollToActiveLyric()
-        })
-      } else {
-        this.removeResizeListener()
-      }
-    },
     currentSong(newSong, oldSong) {
       if (!newSong.id) {
         this.setPlayerShow(false)
@@ -396,14 +303,14 @@ $img-left-padding: 36px;
 $img-outer-border-d: 320px;
 $img-outer-d: 300px;
 
-.player {
+.fm {
   position: fixed;
   top: $header-height;
   bottom: $mini-player-height;
-  left: 0;
+  left: 300px;
   right: 0;
-  padding: 0 36px;
-  background: var(--player-bgcolor);
+  padding-right: 236px;
+  padding-left: 136px;
   z-index: $song-detail-z-index;
   overflow: hidden;
   overflow-y: auto;
@@ -418,7 +325,7 @@ $img-outer-d: 300px;
   }
 
   .content {
-    max-width: 870px;
+    max-width: 100vw;
     margin: auto;
 
     .song {
@@ -438,6 +345,12 @@ $img-outer-d: 300px;
           top: -$support-d-half;
           width: $support-d;
           height: $support-d;
+          z-index: 2;
+        }
+
+        .controls {
+          position: absolute;
+          bottom: 20px;
           z-index: 2;
         }
 
@@ -580,20 +493,6 @@ $img-outer-d: 300px;
         padding-left: 36px;
         width: 28%;
         overflow: hidden;
-
-        .simi-playlists {
-          margin-bottom: 36px;
-        }
-
-        .simi-songs {
-          .play-icon {
-            @include abs-center;
-          }
-        }
-
-        .simi-item {
-          margin-bottom: 6px;
-        }
 
         .title {
           font-size: $font-size-lg;

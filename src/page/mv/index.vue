@@ -71,11 +71,11 @@ export default {
       required: true
     }
   },
-  metaInfo() {
-    return {
-      title: this.mvDetail.name
-    }
-  },
+  // metaInfo() {
+  //   return {
+  //     title: this.mvDetail.name
+  //   }
+  // },
   created() {
     this.init()
   },

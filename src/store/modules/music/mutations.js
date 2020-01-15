@@ -38,4 +38,7 @@ export default {
   setMenuShow(state, show) {
     state.isMenuShow = show
   },
+  setFMMode(state, fm) {
+    state.isFMMode = fm
+  }
 }

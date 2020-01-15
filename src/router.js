@@ -13,6 +13,8 @@ const SearchMvs = () => import('@/page/search/mvs')
 const Mvs = () => import('@/page/mvs')
 const Mv = () => import('@/page/mv')
 
+const FM = () => import('@/page/fm')
+
 // 内容需要居中的页面
 export const layoutCenterNames = ['discovery', 'playlists', 'songs', 'mvs']
 
@@ -25,6 +27,15 @@ export const menuRoutes = [
     meta: {
       title: '发现音乐',
       icon: 'music',
+    },
+  },
+  {
+    path: '/fm',
+    name: 'fm',
+    component: FM,
+    meta: {
+      title: '私人FM',
+      icon: 'fm',
     },
   },
   {

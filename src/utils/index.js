@@ -11,3 +11,5 @@ export * from './business'
 export * from './axios'
 
 export * from './mixin'
+
+export * from './control'

@@ -61,8 +61,12 @@ export default {
   created() {
     this.uid = storage.get(UID_KEY)
     if (isDef(this.uid)) {
-      this.onLogin(null, null, this.uid)
-      this.refresh()
+      this.onLogin(null, null, this.uid).then(success => {
+        if (success) {
+          this.refresh()
+        }
+      })
+
     }
   },
   data() {
@@ -89,6 +93,7 @@ export default {
       if (success) {
         this.onCloseModal()
       }
+      return success
     },
     onLogout() {
       confirm("确定要注销吗？", () => {

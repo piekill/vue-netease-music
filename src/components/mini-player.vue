@@ -31,7 +31,7 @@
     </div>
     <!-- 控制台 -->
     <div class="control">
-      <Icon :size="24" @click="prev" class="icon" type="prev" />
+      <Icon :size="24" @click="prev" class="icon" type="prev"/>
       <el-popover
         :value="isPlayErrorPromptShow"
         placement="top"
@@ -112,6 +112,7 @@ import {
 import Storage from "good-storage"
 import Share from "@/components/share"
 import { VOLUME_KEY, playModeMap, isDef } from "@/utils"
+import control from "@/utils/control"
 
 const DEFAULT_VOLUME = 0.75
 export default {
@@ -157,13 +158,17 @@ export default {
       this.setCurrentTime(time)
     },
     prev() {
-      if (this.songReady) {
+      if (!this.isFMMode && this.songReady) {
         this.startSong(this.prevSong)
       }
     },
     next() {
-      if (this.songReady) {
-        this.startSong(this.nextSong)
+      if (this.isFMMode) {
+        control.$emit("nextFM")
+      } else {
+        if (this.songReady) {
+          this.startSong(this.nextSong)
+        }
       }
     },
     end() {
@@ -193,7 +198,7 @@ export default {
       this.setPlayerShow(!this.isPlayerShow)
     },
     goGitHub() {
-      window.open("https://github.com/sl1673495/vue-netease-music")
+      window.open("https://github.com/piekill/vue-netease-music")
     },
 
     ...mapMutations([
@@ -271,7 +276,8 @@ export default {
       "playMode",
       "isPlaylistShow",
       "isPlaylistPromptShow",
-      "isPlayerShow"
+      "isPlayerShow",
+      "isFMMode"
     ]),
     ...mapGetters(["prevSong", "nextSong"])
   },

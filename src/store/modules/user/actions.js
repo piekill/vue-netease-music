@@ -22,8 +22,12 @@ export default {
         return error()
       }
     }
-    const { code } = await loginStatus()
-    if (code !== 200) {
+    try {
+      const {code} = await loginStatus()
+      if (code !== 200) {
+        return false
+      }
+    } catch (e) {
       return false
     }
     const user = await getUserDetail(uid)

@@ -1,4 +1,4 @@
-import { getSongUrl } from "@/api"
+import { getSongUrl, getFM } from "@/api"
 import storage from 'good-storage'
 import { PLAY_HISTORY_KEY, notify, getSongImg } from '@/utils'
 import store from '@/store'
@@ -6,6 +6,12 @@ import store from '@/store'
 export default {
   // 整合歌曲信息 并且开始播放
   async startSong({ commit, state, dispatch }, rawSong) {
+    if ('fmMode' in rawSong) {
+      commit("setFMMode", true)
+      rawSong = rawSong.song
+    } else {
+      commit("setFMMode", false)
+    }
     // 浅拷贝一份 改变引用
     // 1.不污染元数据
     // 2.单曲循环为了触发watch
@@ -65,6 +71,9 @@ export default {
       copy.unshift(song)
       commit('setPlaylist', copy)
     }
+  },
+  async getFMSongs() {
+    return getFM()
   }
 }
 
