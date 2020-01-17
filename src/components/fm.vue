@@ -13,7 +13,11 @@
             </div>
           </div>
           <div class="controls">
-            <el-button @click="newFMSong" circle type="primary" style="font-size: 22px;">➤</el-button>
+            <el-button @click="changeFavor" circle style="font-size: 22px; color: #d33a31;">
+              <span v-if="favorite">♥</span>
+              <span v-else>♡</span>
+            </el-button>
+            <el-button @click="newFMSong" circle style="font-size: 22px; color: #d33a31;">➤</el-button>
           </div>
         </div>
 
@@ -28,7 +32,7 @@
               <div class="value">{{currentSong.artistsText}}</div>
             </div>
           </div>
-          <empty v-if="nolyric">还没有歌词哦~</empty>
+          <empty v-if="nolyric">没有歌词哦~</empty>
           <Scroller
             :data="lyric"
             :options="{disableTouch: true}"
@@ -71,6 +75,10 @@ import { debounce, isDef, createSong, goMvWithCheck } from "@/utils"
 import Comments from "@/components/comments"
 import control from "@/utils/control"
 import { mapState, mapMutations, mapActions } from "@/store/helper/music"
+import {
+  mapActions as mapUserActions,
+  mapState as mapUserState
+} from "@/store/helper/user"
 
 const WHEEL_TYPE = "wheel"
 const SCROLL_TYPE = "scroll"
@@ -90,12 +98,14 @@ export default {
       this.scrollToActiveLyric()
     })
     control.$on("nextFM", this.newFMSong)
+    control.$on("setListFavor", this.setFavor)
   },
   data() {
     return {
       lyric: [],
       tlyric: [],
-      nolyric: false
+      nolyric: false,
+      favorite: false
     }
   },
   mounted() {
@@ -104,6 +114,7 @@ export default {
     } else {
       this.updateLyric()
     }
+    this.setFavor()
   },
   methods: {
     nomalizeSong(song) {
@@ -130,6 +141,17 @@ export default {
         this.startSong({'song': normSong, 'fmMode': true})
         this.setPlaylist([normSong])
         this.setPlaylistPromptShow(false)
+        this.setFavor()
+      })
+    },
+    setFavor() {
+      this.favorite = this.likeList.has(this.currentSong.id)
+    },
+    changeFavor() {
+      const favor = !this.favorite
+      this.likeSong({id: this.currentSong.id, like: favor}).then(() => {
+        this.favorite = favor
+        control.$emit("setMiniFavor")
       })
     },
     async updateSong() {
@@ -207,7 +229,8 @@ export default {
       window.removeEventListener("resize", this.resizeScroller)
     },
     ...mapMutations(["setPlayerShow", "setPlaylist", "setPlaylistPromptShow", "setFMMode"]),
-    ...mapActions(["startSong", "addToPlaylist", "getFMSongs"])
+    ...mapActions(["startSong", "addToPlaylist", "getFMSongs"]),
+    ...mapUserActions(["likeSong"])
   },
   computed: {
     activeLyricIndex() {
@@ -250,7 +273,8 @@ export default {
       }
       return ret
     },
-    ...mapState(["currentSong", "currentTime", "playing", "isPlayerShow", "isFMMode"])
+    ...mapState(["currentSong", "currentTime", "playing", "isPlayerShow", "isFMMode"]),
+    ...mapUserState(["likeList"])
   },
   watch: {
     currentSong(newSong, oldSong) {
@@ -350,7 +374,7 @@ $img-outer-d: 300px;
 
         .controls {
           position: absolute;
-          bottom: 20px;
+          top: 430px;
           z-index: 2;
         }
 

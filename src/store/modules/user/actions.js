@@ -1,7 +1,8 @@
 import storage from 'good-storage'
 import { UID_KEY } from '@/utils'
 import { notify, isDef } from '@/utils'
-import { getUserDetail, getUserPlaylist, userLogin, getCloudList, userLogout, loginRefresh, loginStatus } from "@/api"
+import { getUserDetail, getUserPlaylist, userLogin, getCloudList, getLikeList, getDailySongs,
+  userLogout, loginRefresh, loginStatus, setLikeSong } from "@/api"
 
 export default {
   async login({ commit }, info) {
@@ -40,17 +41,35 @@ export default {
     commit('setCloudList', new Set(data.map(song => {
       return song.simpleSong.id
     })))
+    const { ids } = await getLikeList()
+    commit('setLikeList', new Set(ids))
     return true
   },
   logout({ commit }) {
     userLogout().finally(() => {
       commit('setUser', {})
       commit('setUserPlaylist', [])
-      commit('setCloudList', [])
+      commit('setCloudList', new Set())
+      commit('setLikeList', new Set())
       storage.set(UID_KEY, null)
     })
   },
   refresh() {
     loginRefresh()
   },
+  async likeSong({ commit }, info) {
+    const { id, like } = info
+    const { code } = await setLikeSong(id, like)
+    if (code !== 200) {
+      notify("Failed to change favor. Logged in?")
+    } else {
+      if (like) {
+        commit('addToLikeList', id)
+        notify("Liked")
+      } else {
+        commit('removeFromLikeList', id)
+        notify("Ditched")
+      }
+    }
+  }
 }

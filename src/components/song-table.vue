@@ -1,7 +1,12 @@
 <script>
 import ElTable from "element-ui/lib/table"
 import { mapMutations, mapActions, mapState } from "@/store/helper/music"
-import { pad, goMvWithCheck } from "@/utils"
+import { pad, goMvWithCheck, isDef } from "@/utils"
+import {
+    mapActions as mapUserActions,
+    mapState as mapUserState
+} from "@/store/helper/user"
+import control from "@/utils/control"
 
 export default {
   props: {
@@ -22,7 +27,10 @@ export default {
       type: Function,
     },
   },
-  data() {
+    created() {
+        control.$on("setListFavor", this.setFavor)
+    },
+    data() {
     const commonHighLightSlotScopes = {
       default: scope => {
         const text = scope.row[scope.column.property]
@@ -56,6 +64,20 @@ export default {
             },
           },
         },
+          {
+              prop: "favorite",
+              label: "",
+              width: "60",
+              scopedSlots: {
+                  default: scope => {
+                      return (
+                          <el-button type="text" class="favor-wrap"
+                            vOn:click_stop_prevent={this.changeFavor.bind(this, scope.row)}>
+                                {scope.row.favorite  ? '♥' : '♡'}
+                            </el-button>
+                  )},
+              },
+          },
         {
           prop: "img",
           label: " ",
@@ -134,6 +156,25 @@ export default {
     }
   },
   methods: {
+      changeFavor(song) {
+          const favor = !song.favorite
+          this.likeSong({id: song.id, like: favor}).then(() => {
+              song.favorite = favor
+              // TODO: find a better way than force udpate
+              this.$forceUpdate()
+              if (song.id === this.currentSong.id) {
+                  control.$emit("setMiniFavor")
+              }
+          })
+      },
+      setFavor() {
+          const favor = this.likeList.has(this.currentSong.id)
+          const curSong = this.songs.filter(song => song.id === this.currentSong.id)[0]
+          if (isDef(curSong)){
+              curSong.favorite = favor
+              this.$forceUpdate()
+          }
+      },
     onRowClick(song) {
       this.startSong(song)
       this.setPlaylist(this.songs)
@@ -164,6 +205,7 @@ export default {
     },
     ...mapMutations(["setPlaylist"]),
     ...mapActions(["startSong"]),
+    ...mapUserActions(["likeSong"])
   },
   computed: {
     showColumns() {
@@ -178,11 +220,16 @@ export default {
       })
     },
     ...mapState(["currentSong"]),
+    ...mapUserState(["likeList"])
   },
   render() {
     const elTableProps = ElTable.props
     // 从$attrs里提取作为prop的值
     const { props, attrs } = genPropsAndAttrs(this.$attrs, elTableProps)
+      const tableSongs = this.songs.map(song => {
+          song.favorite = this.likeList.has(song.id)
+          return song
+      })
     const tableAttrs = {
       attrs,
       on: {
@@ -193,7 +240,7 @@ export default {
         ...props,
         cellClassName: this.tableCellClassName,
         headerCellClassName: "title-th",
-        data: this.songs,
+        data: tableSongs,
       },
       style: { width: "99.9%" },
     }
@@ -257,6 +304,10 @@ function genPropsAndAttrs(rawAttrs, componentProps) {
     color: var(--font-color-grey-shallow);
   }
 
+    .favor-wrap {
+        font-size: 16px;
+        color: $theme-color;
+    }
   .img-wrap {
     position: relative;
     @include img-wrap(60px);

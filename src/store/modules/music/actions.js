@@ -47,7 +47,9 @@ export default {
       const curIdx = state.playlist.findIndex(({ id }) => song.id === id)
       // 清空当前歌曲
       dispatch('clearCurrentSong')
-      dispatch('startSong', state.playlist[(curIdx + 1) % state.playlist.length])
+      if (curIdx + 1 < state.playlist.length) {
+        dispatch('startSong', state.playlist[curIdx + 1])
+      }
     }
   },
   clearCurrentSong({ commit }) {

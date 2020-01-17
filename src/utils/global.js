@@ -9,6 +9,8 @@ import {
   TableColumn,
   Popover,
   Pagination,
+  Form,
+  FormItem
 } from "element-ui"
 import VueLazyload from "vue-lazyload"
 import Meta from 'vue-meta'
@@ -44,7 +46,8 @@ export default {
     Vue.use(Loading)
     Vue.use(Dialog)
     Vue.use(Button)
-
+    Vue.use(Form)
+    Vue.use(FormItem)
     Vue.use(Meta)
 
     Vue.use(VueLazyload, {

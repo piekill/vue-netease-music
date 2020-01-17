@@ -11,6 +11,12 @@
             <Icon :size="24" :type="playControlIcon" color="white" />
           </div>
         </div>
+        <div>
+          <el-button type="text" @click="changeFavor"  class="mini-favor" >
+            <span v-if="favorite">♥</span>
+            <span v-else>♡</span>
+          </el-button>
+        </div>
         <div class="content">
           <div class="top">
             <p class="name">{{ currentSong.name }}</p>
@@ -96,6 +102,7 @@
       @canplay="ready"
       @ended="end"
       @timeupdate="updateTime"
+      @stalled="forward"
       ref="audio"
       autoplay
     ></audio>
@@ -113,6 +120,10 @@ import Storage from "good-storage"
 import Share from "@/components/share"
 import { VOLUME_KEY, playModeMap, isDef } from "@/utils"
 import control from "@/utils/control"
+import {
+  mapActions as mapUserActions,
+  mapState as mapUserState
+} from "@/store/helper/user"
 
 const DEFAULT_VOLUME = 0.75
 export default {
@@ -120,8 +131,12 @@ export default {
     return {
       isPlayErrorPromptShow: false,
       songReady: false,
-      volume: Storage.get(VOLUME_KEY, DEFAULT_VOLUME)
+      volume: Storage.get(VOLUME_KEY, DEFAULT_VOLUME),
+      favorite: false
     }
+  },
+  created() {
+    control.$on("setMiniFavor", this.setFavor)
   },
   mounted() {
     this.audio.volume = this.volume
@@ -200,7 +215,21 @@ export default {
     goGitHub() {
       window.open("https://github.com/piekill/vue-netease-music")
     },
-
+    forward() {
+      const stalledTime = this.audio.currentTime
+      this.audio.load()
+      this.audio.currentTime = stalledTime
+    },
+    changeFavor() {
+      const favor = !this.favorite
+      this.likeSong({id: this.currentSong.id, like: favor}).then(() => {
+        this.favorite = favor
+        control.$emit("setListFavor")
+      })
+    },
+    setFavor() {
+      this.favorite = this.likeList.has(this.currentSong.id)
+    },
     ...mapMutations([
       "setCurrentTime",
       "setPlayingState",
@@ -208,10 +237,12 @@ export default {
       "setPlaylistShow",
       "setPlayerShow"
     ]),
-    ...mapActions(["startSong"])
+    ...mapActions(["startSong"]),
+    ...mapUserActions(["likeSong"])
   },
   watch: {
     currentSong(newSong, oldSong) {
+      this.favorite = this.likeList.has(newSong.id)
       // 清空了歌曲
       if (!newSong.id) {
         this.audio.pause()
@@ -279,7 +310,8 @@ export default {
       "isPlayerShow",
       "isFMMode"
     ]),
-    ...mapGetters(["prevSong", "nextSong"])
+    ...mapGetters(["prevSong", "nextSong"]),
+    ...mapUserState(["likeList"])
   },
   components: { Share }
 }
@@ -299,7 +331,11 @@ export default {
   padding: 8px 16px;
   padding-right: 24px;
   background: var(--body-bgcolor);
-
+  .mini-favor {
+    font-size: 22px;
+    color: $theme-color;
+    margin-right: 10px;
+  }
   .song {
     display: flex;
     flex: 4;

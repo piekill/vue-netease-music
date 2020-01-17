@@ -10,7 +10,7 @@ export default {
   // 播放状态
   playing: false,
   // 播放模式
-  playMode: playModeMap.sequence.code,
+  playMode: playModeMap.random.code,
   // 播放列表显示
   isPlaylistShow: false,
   // 播放提示显示

@@ -46,7 +46,7 @@
                 <div class="value">{{currentSong.artistsText}}</div>
               </div>
             </div>
-            <empty v-if="nolyric">还没有歌词哦~</empty>
+            <empty v-if="nolyric">没有歌词哦~</empty>
             <Scroller
               :data="lyric"
               :options="{disableTouch: true}"

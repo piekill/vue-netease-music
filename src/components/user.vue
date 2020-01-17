@@ -16,31 +16,37 @@
       :modal="false"
       :visible.sync="visible"
       :width="$utils.toRem(320)"
+      @closed="clearInputs"
     >
       <p slot="title">登录</p>
-      <div class="login-body">
-        <el-input
-          class="input"
-          placeholder="请输入网易云邮箱账号"
-          v-model="email"
-          type="email"
-        />
-        <el-input
-          class="input"
-          placeholder="请输入密码"
-          v-model="password"
-          type="password"
-        />
-      </div>
-      <span class="dialog-footer" slot="footer">
-        <el-button
-          :loading="loading"
-          @click="onLogin(email, password, uid)"
-          class="login-btn"
-          type="primary"
+      <el-form class="login-body">
+        <el-form-item>
+          <el-input
+            class="input"
+            placeholder="请输入网易云邮箱账号"
+            v-model="email"
+            type="text"
+            autocomplete="on"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-input
+            class="input"
+            placeholder="请输入密码"
+            v-model="password"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button
+                  :loading="loading"
+                  @click="onLogin(email, password, uid)"
+                  class="login-btn"
+                  type="primary"
           >登 录</el-button
-        >
-      </span>
+          >
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -84,6 +90,10 @@ export default {
     },
     onCloseModal() {
       this.visible = false
+      this.clearInputs()
+    },
+    clearInputs() {
+      this.password = ""
     },
     async onLogin(email, password, uid) {
       this.loading = true

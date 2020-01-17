@@ -7,5 +7,14 @@ export default {
   },
   setCloudList(state, cloudList) {
     state.cloudList = cloudList
+  },
+  setLikeList(state, likeList) {
+    state.likeList = likeList
+  },
+  addToLikeList(state, id) {
+    state.likeList.add(id)
+  },
+  removeFromLikeList(state, id) {
+    state.likeList.delete(id)
   }
 }
