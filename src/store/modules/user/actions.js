@@ -12,7 +12,7 @@ export default {
     }
     let {email, password, uid} = info
 
-    if (!isDef(uid)) {
+    if (!isDef(uid) || (isDef(email) && isDef(password))) {
       if (!isDef(email) || !isDef(password)) {
         return error()
       }
@@ -43,16 +43,19 @@ export default {
     })))
     const { ids } = await getLikeList()
     commit('setLikeList', new Set(ids))
+    const { recommend } = await getDailySongs()
+    commit('setDailySongs', recommend)
     return true
   },
-  logout({ commit }) {
-    userLogout().finally(() => {
-      commit('setUser', {})
-      commit('setUserPlaylist', [])
-      commit('setCloudList', new Set())
-      commit('setLikeList', new Set())
-      storage.set(UID_KEY, null)
-    })
+  async logout({ commit }) {
+    await userLogout()
+    commit('setUser', {})
+    commit('setUserPlaylist', [])
+    commit('setCloudList', new Set())
+    commit('setLikeList', new Set())
+    commit('setDailySongs', [])
+    storage.set(UID_KEY, null)
+    return true
   },
   refresh() {
     loginRefresh()
@@ -65,10 +68,10 @@ export default {
     } else {
       if (like) {
         commit('addToLikeList', id)
-        notify("Liked")
+        notify.success("Liked")
       } else {
         commit('removeFromLikeList', id)
-        notify("Ditched")
+        notify.success("Ditched")
       }
     }
   }

@@ -8,7 +8,7 @@
         class="block"
         v-if="shouldHotCommentShow"
       >
-        <p class="title">精彩评论</p>
+        <p class="title">精彩评论 <span class="count">({{total}})</span> </p>
         <Comment
           :border="!$utils.isLast(index, hotComments)"
           :comment="comment"

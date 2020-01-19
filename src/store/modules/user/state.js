@@ -6,5 +6,7 @@ export default {
   // 云盘
   cloudList: new Set([]),
   // Like list
-  likeList: new Set([])
+  likeList: new Set([]),
+  // Daily songs
+  dailySongs: []
 }

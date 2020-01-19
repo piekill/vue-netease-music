@@ -1,4 +1,5 @@
 import { requestWithoutLoading } from '@/utils'
+const crypto = require('crypto')
 
 export const getUserDetail = (uid) => requestWithoutLoading.get("/user/detail", { params: { uid } })
 
@@ -7,13 +8,16 @@ export const getUserPlaylist = (uid) => requestWithoutLoading.get("/user/playlis
 
 export const getCloudList = () => requestWithoutLoading.get("/user/cloud", {params: {limit: PLAYLIST_LIMIT}, withCredentials: true})
 
-export const userLogin = (email, password) => requestWithoutLoading.get("/login", {params: {email: email, password: password}, withCredentials: true})
+export const userLogin = (email, password) => {
+    const pwd = crypto.createHash('md5').update(password).digest('hex')
+    return requestWithoutLoading.get("/login", {params: {email: email, password: pwd}, withCredentials: true})
+}
 
-export const userLogout = () => requestWithoutLoading.get("/logout", {withCredentials: true})
+export const userLogout = () => requestWithoutLoading.get("/logout", {withCredentials: true, params: {timestamp: Date.now()}})
 
 export const loginRefresh = () => requestWithoutLoading.get("/login/refresh", {withCredentials: true})
 
-export const loginStatus = () => requestWithoutLoading.get("/login/status", {withCredentials: true})
+export const loginStatus = () => requestWithoutLoading.get("/login/status", {withCredentials: true, params: {timestamp: Date.now()}})
 
 export const getLikeList = (uid) => requestWithoutLoading.get("/likelist", {params: { uid }, withCredentials: true})
 

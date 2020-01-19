@@ -1,7 +1,7 @@
 // 歌单详情页面
 <template>
-  <div class="playlist-detail" v-if="playlist.id">
-    <DetailHeader ref="header" :playlist="playlist" :songs="songs" />
+  <div class="playlist-detail" v-if="playlist.id || id === 0">
+    <DetailHeader v-if="id !== 0" ref="header" :playlist="playlist" :songs="songs" />
     <div class="tabs-wrap">
       <Tabs :tabs="tabs" type="theme" v-model="activeTab" />
       <el-input
@@ -33,14 +33,14 @@
 </template>
 
 <script>
-import DetailHeader from "./header"
-import SongTable from "@/components/song-table"
-import Comments from "@/components/comments"
-import { createSong, scrollInto } from "@/utils"
-import { getListDetail } from "@/api"
-import { getSongDetail } from "@/api"
+  import DetailHeader from "./header"
+  import SongTable from "@/components/song-table"
+  import Comments from "@/components/comments"
+  import {createSong, scrollInto} from "@/utils"
+  import {getListDetail, getSongDetail} from "@/api"
+  import {mapState as mapUserState} from "@/store/helper/user"
 
-const MAX = 500
+  const MAX = 500
 const SONG_IDX = 0
 const COMMENT_IDX = 1
 export default {
@@ -65,25 +65,33 @@ export default {
   },
   methods: {
     async init() {
-      const { playlist } = await getListDetail({ id: this.id })
-      this.playlist = playlist
-      this.genSonglist(playlist)
+      if (this.id !== 0) {
+        const {playlist} = await getListDetail({id: this.id})
+        this.playlist = playlist
+        this.genSonglist(playlist)
+      } else {
+        this.genSonglist()
+      }
     },
     async genSonglist(playlist) {
-      const trackIds = playlist.trackIds.map(({ id }) => id)
-      const songDetails = await getSongDetail(trackIds.slice(0, MAX))
-      const songs = songDetails.songs.map(({ id, name, al, ar, mv, dt }) =>
-        createSong({
-          id,
-          name,
-          artists: ar,
-          duration: dt,
-          mvId: mv,
-          albumName: al.name,
-          img: al.picUrl,
-        }),
-      )
-      this.songs = songs
+      if (this.id !== 0) {
+        const trackIds = playlist.trackIds.map(({id}) => id)
+        const songDetails = await getSongDetail(trackIds.slice(0, MAX))
+        this.songs = songDetails.songs.map(({id, name, al, ar, mv, dt}) =>
+                createSong({
+                  id,
+                  name,
+                  artists: ar,
+                  duration: dt,
+                  mvId: mv,
+                  albumName: al.name,
+                  img: al.picUrl,
+                }),
+        )
+      } else {
+        this.songs = this.dailySongs.map(({id, name, album, artists, mvid, duration}) =>
+        createSong({id, name, artists, duration, mvId: mvid, albumName: album.name, img: album.picUrl}))
+      }
     },
     onCommentsUpdate({ total }) {
       this.tabs.splice(COMMENT_IDX, 1, `评论(${total})`)
@@ -115,6 +123,7 @@ export default {
           .includes(this.searchValue.toLowerCase()),
       )
     },
+    ...mapUserState(["dailySongs"])
   },
   watch: {
     id: {

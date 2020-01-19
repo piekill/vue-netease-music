@@ -61,6 +61,7 @@ import {
   mapGetters as mapUserGetters
 } from "@/store/helper/user"
 import router from '@/router.js'
+import control from "../utils/control"
 
 export default {
   // 自动登录
@@ -102,13 +103,13 @@ export default {
       })
       if (success) {
         this.onCloseModal()
+        control.$emit("loggedIn")
       }
       return success
     },
     onLogout() {
       confirm("确定要注销吗？", () => {
-        this.logout()
-        router.push('/')
+        this.logout().finally(() => router.go(0))
       })
     },
     ...mapUserActions(["login", "logout", "refresh", "checkStatus"])

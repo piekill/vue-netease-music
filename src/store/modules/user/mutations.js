@@ -16,5 +16,8 @@ export default {
   },
   removeFromLikeList(state, id) {
     state.likeList.delete(id)
+  },
+  setDailySongs(state, recommend) {
+    state.dailySongs = recommend
   }
 }
