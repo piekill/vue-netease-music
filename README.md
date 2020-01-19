@@ -1,40 +1,36 @@
-# 🎵基于Vue2、Vue-CLI3的高仿网易云mac客户端播放器（PC） Online Music Player
+# 网易云音乐Web客户端(改进版) - An improved version of Netease Cloud Music web client
 
-音乐播放器虽然烂大街了，但是作为前端没自己撸一个一直是个遗憾，而且偶然间发现 pc 端 web 版的网易云音乐做的实在是太简陋了，社区仿 pc 客户端的网易云也不多见，为了弥补这个遗憾，就用 vue 全家桶模仿 mac 客户端的 ui 实现了一个，欢迎提出意见和 star~
+Forked from https://github.com/sl1673495/vue-netease-music. See features for a list of improvements.
 
-### [预览地址](https://music.sl1673495.now.sh/)
+Credit to ssh (https://github.com/sl1673495)
 
-### [源码地址](https://github.com/sl1673495/vue-netease-music)
+### Demo
 
-### 进度
+http://m.piekill.com
 
-- [x] mv 页（3.0 新增）
-- [x] cd 页 (2.0 新增)
-- [x] 搜索建议
-- [x] 搜索详情
-- [x] 播放（版权歌曲无法播放)
-- [x] 发现页
-- [x] 播放列表
-- [x] 播放记录
-- [x] 全部歌单
-- [x] 歌单详情
-- [x] 最新音乐
-- [x] 主题换肤功能
-- [x] 登录(网易云 uid 登录)
+### Features
 
-### 后端接口
+- [x] 邮箱登录 (improvement)
+- [x] 云盘音乐 (improvement)
+- [x] 私人FM (improvement)
+- [x] 喜欢音乐 (improvement)
+- [x] 每日推荐 (improvement)
+- [x] mv 页 (original)
+- [x] cd 页 (original)
+- [x] 搜索建议 (original)
+- [x] 搜索详情 (original)
+- [x] 播放 (original)
+- [x] 发现页 (original)
+- [x] 播放列表 (original)
+- [x] 播放记录 (original)
+- [x] 全部歌单 (original)
+- [x] 歌单详情 (original)
+- [x] 最新音乐 (original)
+- [x] 主题换肤功能 (original)
+
+### Backend
 
 https://binaryify.github.io/NeteaseCloudMusicApi
-
-### 技术栈
-
-- Vue 全家桶 Vue-CLI3 create 出来的。
-- ui 库用了魔改样式的 element-ui
-- 歌词滚动部分用了黄轶老大的 better-scroll（贼爽）
-- 主题换肤用的 css 变量替换。
-- ES 6 / 7 （JavaScript 语言的下一代标准）
-- Sass（CSS 预处理器）
-- postcss-pxtorem（自动处理 rem，妈妈再也不用担心屏幕太大太小了）
 
 ### Screenshots
 
@@ -46,12 +42,9 @@ https://binaryify.github.io/NeteaseCloudMusicApi
 
 ![音乐播放](https://user-images.githubusercontent.com/23615778/62509202-da358580-b83c-11e9-98e1-530e5741ff56.png)
 
-### 安装与使用
+### Usage
 
 ```
 npm i
 npm run dev
 ```
-
-### 友情链接
-[mmPlayer](https://github.com/maomao1996/Vue-mmPlayer)
