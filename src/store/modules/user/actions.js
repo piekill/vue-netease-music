@@ -29,8 +29,8 @@ export default {
       }
     }
     try {
-      const {code} = await loginStatus()
-      if (code !== 200) {
+      const {data} = await loginStatus()
+      if (data.code !== 200) {
         return false
       }
     } catch (e) {
