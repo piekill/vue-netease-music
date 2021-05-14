@@ -19,15 +19,38 @@
       @closed="clearInputs"
     >
       <p slot="title">登录</p>
+      <div class="login-radio">
+        <el-radio v-model="loginMode" label="email">邮箱</el-radio>
+        <el-radio v-model="loginMode" label="phone">手机</el-radio>
+      </div>
       <el-form class="login-body">
         <el-form-item>
           <el-input
             class="input"
             placeholder="请输入网易云邮箱账号"
             v-model="email"
-            type="text"
+            type="email"
             autocomplete="on"
+            v-if="loginMode === 'email'"
           />
+          <div v-if="loginMode === 'phone'">
+            <el-select v-model="countrycode" class="country-code-wrap" filterable="true" default-first-option="true">
+              <el-option v-for="item in countrycodes"
+                         :key="item.value"
+                         :label="item.value"
+                         :value="item.value">
+                <span style="float: left">{{ item.name }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">+{{ item.value }}</span>
+              </el-option>
+            </el-select>
+            <el-input
+              class="input phone-wrap"
+              placeholder="请输入网易云注册手机"
+              v-model="phone"
+              type="tel"
+              autocomplete="on"
+            />
+          </div>
         </el-form-item>
         <el-form-item>
           <el-input
@@ -40,7 +63,7 @@
         <el-form-item>
           <el-button
                   :loading="loading"
-                  @click="onLogin(email, password, uid)"
+                  @click="onLogin(uid, email, password, phone, countrycode, loginMode)"
                   class="login-btn"
                   type="primary"
           >登 录</el-button
@@ -61,14 +84,15 @@ import {
   mapGetters as mapUserGetters
 } from "@/store/helper/user"
 import router from '@/router.js'
-import control from "../utils/control"
+import control from "@/utils/control"
+import { COUNTRY_CODES } from "@/utils/config"
 
 export default {
   // 自动登录
   created() {
     this.uid = storage.get(UID_KEY)
     if (isDef(this.uid)) {
-      this.onLogin(null, null, this.uid).then(success => {
+      this.onLogin(this.uid).then(success => {
         if (success) {
           this.refresh()
         }
@@ -82,7 +106,11 @@ export default {
       loading: false,
       uid: null,
       email: "",
-      password: ""
+      password: "",
+      phone: "",
+      countrycode: "86",
+      loginMode: "email",
+      countrycodes: COUNTRY_CODES
     }
   },
   methods: {
@@ -96,9 +124,9 @@ export default {
     clearInputs() {
       this.password = ""
     },
-    async onLogin(email, password, uid) {
+    async onLogin(uid, email, password, phone, countrycode, loginMode) {
       this.loading = true
-      const success = await this.login({email, password, uid}).finally(() => {
+      const success = await this.login({uid, email, password, phone, countrycode, loginMode}).finally(() => {
         this.loading = false
       })
       if (success) {
@@ -172,6 +200,19 @@ export default {
     .avatar {
       @include round(40px);
     }
+  }
+
+  .login-radio {
+    margin-bottom: 20px;
+  }
+
+  .country-code-wrap {
+    width: 80px;
+  }
+
+  .phone-wrap {
+    width: 195px;
+    margin-left: 5px;
   }
 }
 </style>

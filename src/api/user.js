@@ -10,7 +10,7 @@ export const getCloudList = () => requestWithoutLoading.get("/user/cloud", {para
 
 export const userLogin = (email, password) => {
     const pwd = crypto.createHash('md5').update(password).digest('hex')
-    return requestWithoutLoading.get("/login", {params: {email: email, password: pwd}, withCredentials: true})
+    return requestWithoutLoading.get("/login", {params: {email: email, md5_password: pwd}, withCredentials: true})
 }
 
 export const userLogout = () => requestWithoutLoading.get("/logout", {withCredentials: true, params: {timestamp: Date.now()}})
@@ -22,3 +22,8 @@ export const loginStatus = () => requestWithoutLoading.get("/login/status", {wit
 export const getLikeList = (uid) => requestWithoutLoading.get("/likelist", {params: { uid }, withCredentials: true})
 
 export const setLikeSong = (id, like) => requestWithoutLoading.get("/like", {params: { id, like }, withCredentials: true})
+
+export const userLoginPhone = (phone, countrycode, password) => {
+    const pwd = crypto.createHash('md5').update(password).digest('hex')
+    return requestWithoutLoading.get("/login/cellphone", {params: {phone: phone, countrycode: countrycode, md5_password: pwd,}, withCredentials: true})
+}

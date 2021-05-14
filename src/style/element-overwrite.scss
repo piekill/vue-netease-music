@@ -134,6 +134,7 @@ $input-height: 24px;
 
   .el-dialog__body {
     color: var(--font-color) !important;
+    padding-top: 15px;
   }
 
   // 右上角图标
@@ -165,4 +166,18 @@ $input-height: 24px;
 $form-item-height: 30px;
 .el-form-item__content {
   height: $form-item-height;
+}
+
+.el-radio__input.is-checked+.el-radio__label {
+  color: $theme-color !important;
+}
+
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: $theme-color !important;
+  background: $theme-color !important;
+}
+
+.el-radio__label {
+  color: #c1c8d7;
+  font-size: 13px !important;
 }

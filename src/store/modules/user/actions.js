@@ -1,7 +1,7 @@
 import storage from 'good-storage'
 import { UID_KEY } from '@/utils'
 import { notify, isDef } from '@/utils'
-import { getUserDetail, getUserPlaylist, userLogin, getCloudList, getLikeList, getDailySongs,
+import { getUserDetail, getUserPlaylist, userLogin, userLoginPhone, getCloudList, getLikeList, getDailySongs,
   userLogout, loginRefresh, loginStatus, setLikeSong } from "@/api"
 
 export default {
@@ -10,14 +10,19 @@ export default {
       notify.error('登录失败，请输入正确的信息。')
       return false
     }
-    let {email, password, uid} = info
+    let {uid, email, password, phone, countrycode, loginMode} = info
 
-    if (!isDef(uid) || (isDef(email) && isDef(password))) {
-      if (!isDef(email) || !isDef(password)) {
+    if (!isDef(uid) || (loginMode === 'email' && isDef(email) && isDef(password))
+        || (loginMode === 'phone' && isDef(phone) && isDef(password))) {
+      if (loginMode === 'email' && (!isDef(email) || !isDef(password))) {
+        return error()
+      }
+      if (loginMode === 'phone' && (!isDef(phone) || !isDef(password))) {
         return error()
       }
       try {
-        const { profile } = await userLogin(email, password)
+        const { profile } = loginMode === 'email' ? await userLogin(email, password) :
+            await userLoginPhone(phone, countrycode, password)
         uid = profile.userId
       } catch (e) {
         return error()
@@ -37,7 +42,10 @@ export default {
     storage.set(UID_KEY, uid)
     const { playlist } = await getUserPlaylist(uid)
     commit('setUserPlaylist', playlist)
-    const { data } = await getCloudList()
+    const { code, data } = await getCloudList()
+      if (code !== 200) {
+          return false
+      }
     commit('setCloudList', new Set(data.map(song => {
       return song.simpleSong.id
     })))

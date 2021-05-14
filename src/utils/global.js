@@ -10,7 +10,10 @@ import {
   Popover,
   Pagination,
   Form,
-  FormItem
+  FormItem,
+  Radio,
+  Select,
+  Option,
 } from "element-ui"
 import VueLazyload from "vue-lazyload"
 import Meta from 'vue-meta'
@@ -49,7 +52,9 @@ export default {
     Vue.use(Form)
     Vue.use(FormItem)
     Vue.use(Meta)
-
+    Vue.use(Radio)
+    Vue.use(Select)
+    Vue.use(Option)
     Vue.use(VueLazyload, {
       loading: EMPTY_IMG,
       error: EMPTY_IMG,
